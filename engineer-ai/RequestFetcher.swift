@@ -9,7 +9,7 @@
 import Foundation
 
 protocol RequestFetcherDelegate: class {
-    func requestFetcher(_ fetcher: RequestFetcher, didFetchHits hits: [Hit])
+    func requestFetcher(_ fetcher: RequestFetcher, didFetchHits hits: Hits)
     func requestFetcher(_ fetcher: RequestFetcher, didFailWithError error: Error)
 }
 
@@ -46,7 +46,7 @@ final class RequestFetcher {
 
         do {
             let hits = try decoder.decode(Hits.self, from: data)
-            delegate?.requestFetcher(self, didFetchHits: hits.hits)
+            delegate?.requestFetcher(self, didFetchHits: hits)
         } catch {
             processError(error)
         }

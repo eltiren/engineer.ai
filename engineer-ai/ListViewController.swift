@@ -60,6 +60,12 @@ class ListViewController: UITableViewController {
     private func updateTitle() {
         title = "Selected: \(model.selectedItemsCount)"
     }
+
+    private func showError(_ error: Error) {
+        let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
 }
 
 extension ListViewController: ListViewControllerModelDelegate {
@@ -86,7 +92,7 @@ extension ListViewController: ListViewControllerModelDelegate {
     }
 
     func listViewControllerModel(_ model: ListViewControllerModel, didFailWithError error: Error) {
-        print(error)
+        showError(error)
     }
 }
 

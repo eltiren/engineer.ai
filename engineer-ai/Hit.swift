@@ -10,6 +10,7 @@ import Foundation
 
 struct Hits: Decodable {
     var hits: [Hit]
+    var nbPages: Int
 }
 
 struct Hit: Decodable {

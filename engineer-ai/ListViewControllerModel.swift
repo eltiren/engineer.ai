@@ -57,6 +57,7 @@ final class ListViewControllerModel {
     private var isFetching = false
     private var fetchPagesQueue = [Int]()
     private var requestFetcher: RequestFetcher?
+    private var numberOfPages = 1000000
 
     init() {
         fetchNextPage()
@@ -75,35 +76,44 @@ final class ListViewControllerModel {
         if isFetching {
             fetchPagesQueue.append(lastLoadedPage)
         } else {
-            isFetching = true
-            requestFetcher = RequestFetcher(page: lastLoadedPage, delegate: self)
-            requestFetcher?.fetch()
+            loadPage(lastLoadedPage)
         }
     }
 
     private func fetchFromQueue() {
         let page = fetchPagesQueue.removeFirst()
+        loadPage(page)
+    }
+
+    private func loadPage(_ page: Int) {
+        guard page <= numberOfPages else {
+            isFetching = false
+            return
+        }
+        isFetching = true
         requestFetcher = RequestFetcher(page: page, delegate: self)
         requestFetcher?.fetch()
     }
 }
 
 extension ListViewControllerModel: RequestFetcherDelegate {
-    func requestFetcher(_ fetcher: RequestFetcher, didFetchHits hits: [Hit]) {
+    func requestFetcher(_ fetcher: RequestFetcher, didFetchHits hits: Hits) {
         if fetchPagesQueue.isEmpty {
             isFetching = false
         } else {
             fetchFromQueue()
         }
 
-        let indexPaths = (self.hits.count ..< self.hits.count + hits.count).map { IndexPath(row: $0, section: 0) }
+        numberOfPages = hits.nbPages
+
+        let indexPaths = (self.hits.count ..< self.hits.count + hits.hits.count).map { IndexPath(row: $0, section: 0) }
         DispatchQueue.main.async {
             if fetcher.page == 1 {
-                self.hits = hits
+                self.hits = hits.hits
                 self.selectedItems.removeAll()
                 self.delegate?.listViewControllerModelDidLoadHits(self)
             } else {
-                self.hits += hits
+                self.hits += hits.hits
                 self.delegate?.listViewControllerModel(self, didAddHitsAt: indexPaths)
             }
         }
