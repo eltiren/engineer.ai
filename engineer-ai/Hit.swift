@@ -13,7 +13,15 @@ struct Hits: Decodable {
 }
 
 struct Hit: Decodable {
-    var createdAtI: Date
+
+    static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        return formatter
+    }()
+
+    var createdAt: Date
     var title: String
     var objectID: String
 }

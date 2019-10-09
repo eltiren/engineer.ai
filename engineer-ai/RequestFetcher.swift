@@ -41,7 +41,7 @@ final class RequestFetcher {
 
     private func processData(_ data: Data) {
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .secondsSince1970
+        decoder.dateDecodingStrategy = .formatted(Hit.dateFormatter)
         decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         do {

@@ -18,6 +18,8 @@ class ListViewController: UITableViewController {
         tableView.estimatedRowHeight = 44
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(HitCell.self, forCellReuseIdentifier: "hit-cell")
+        tableView.allowsMultipleSelection = true
+
         model.delegate = self
 
         listRefreshControl.addTarget(self, action: #selector(ListViewController.refresh), for: .valueChanged)
@@ -42,10 +44,13 @@ class ListViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         let item = model.item(at: indexPath)
         model.toggleItem(item)
-        tableView.reloadRows(at: [indexPath], with: .none)
+    }
+
+    override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        let item = model.item(at: indexPath)
+        model.toggleItem(item)
     }
 
     @objc func refresh() {
@@ -87,7 +92,12 @@ extension ListViewController: ListViewControllerModelDelegate {
 
 extension ListViewController: HitCellDelegate {
     func hitCellSelectionStateChanged(_ cell: HitCell) {
-        guard let hit = cell.hit else { return }
+        guard let hit = cell.hit, let indexPath = tableView.indexPath(for: cell) else { return }
+        if model.isItemSelected(at: indexPath) {
+            tableView.deselectRow(at: indexPath, animated: true)
+        } else {
+            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+        }
         model.toggleItem(hit)
     }
 }

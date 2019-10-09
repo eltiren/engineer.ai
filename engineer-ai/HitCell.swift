@@ -40,25 +40,24 @@ final class HitCell: UITableViewCell {
     func setup(hit: Hit, isSelected: Bool) {
         self.hit = hit
         titleLabel.text = hit.title
-        dateLabel.text = Self.dateFormatter.string(from: hit.createdAtI)
-        toggle.setOn(isSelected, animated: false)
-        setSelected(isSelected)
+        dateLabel.text = Self.dateFormatter.string(from: hit.createdAt)
+        setSelected(isSelected, animated: false)
     }
 
-    func setSelected(_ selected: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        toggle.setOn(isSelected, animated: animated)
         titleLabel.textColor = selected ? .black : .darkGray
         dateLabel.textColor = selected ? .darkGray : .gray
     }
 
     @objc func toggleAction(_ sender: Any?) {
         delegate?.hitCellSelectionStateChanged(self)
-        setSelected(toggle.isOn)
+        setSelected(toggle.isOn, animated: true)
     }
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
-
-        selectionStyle = .none
 
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         dateLabel.translatesAutoresizingMaskIntoConstraints = false
