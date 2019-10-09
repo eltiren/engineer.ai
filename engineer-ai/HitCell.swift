@@ -88,7 +88,28 @@ final class HitCell: UITableViewCell {
                 titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
             ])
         } else {
-            // Fallback on earlier versions
+            NSLayoutConstraint.activate([
+                .init(item: dateLabel, attribute: .top, relatedBy: .equal,
+                      toItem: contentView, attribute: .top, multiplier: 1, constant: 8),
+
+                .init(item: dateLabel, attribute: .leading, relatedBy: .equal,
+                      toItem: contentView, attribute: .leading, multiplier: 1, constant: 20),
+
+                .init(item: dateLabel, attribute: .trailing, relatedBy: .equal,
+                      toItem: contentView, attribute: .trailing, multiplier: 1, constant: -10),
+
+                .init(item: titleLabel, attribute: .top, relatedBy: .equal,
+                      toItem: dateLabel, attribute: .bottom, multiplier: 1, constant: 4),
+
+                .init(item: titleLabel, attribute: .leading, relatedBy: .equal,
+                      toItem: contentView, attribute: .leading, multiplier: 1, constant: 20),
+
+                .init(item: titleLabel, attribute: .trailing, relatedBy: .equal,
+                      toItem: contentView, attribute: .trailing, multiplier: 1, constant: -10),
+
+                .init(item: titleLabel, attribute: .bottom, relatedBy: .equal,
+                      toItem: contentView, attribute: .bottom, multiplier: 1, constant: -8)
+            ])
         }
     }
 
