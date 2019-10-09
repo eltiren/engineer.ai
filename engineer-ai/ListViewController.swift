@@ -11,6 +11,7 @@ import UIKit
 class ListViewController: UITableViewController {
 
     private let model = ListViewControllerModel()
+    private let listRefreshControl = UIRefreshControl()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,6 +19,14 @@ class ListViewController: UITableViewController {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(HitCell.self, forCellReuseIdentifier: "hit-cell")
         model.delegate = self
+
+        listRefreshControl.addTarget(self, action: #selector(ListViewController.refresh), for: .valueChanged)
+
+        if #available(iOS 10.0, *) {
+            tableView.refreshControl = listRefreshControl
+        } else {
+            tableView.addSubview(listRefreshControl)
+        }
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -39,6 +48,10 @@ class ListViewController: UITableViewController {
         tableView.reloadRows(at: [indexPath], with: .none)
     }
 
+    @objc func refresh() {
+        model.reload()
+    }
+
     private func updateTitle() {
         title = "Selected: \(model.selectedItemsCount)"
     }
@@ -46,18 +59,25 @@ class ListViewController: UITableViewController {
 
 extension ListViewController: ListViewControllerModelDelegate {
     func listViewControllerModel(_ model: ListViewControllerModel, didAddHitsAt indexPaths: [IndexPath]) {
-        tableView.beginUpdates()
-        tableView.insertRows(at: indexPaths, with: .fade)
-        tableView.endUpdates()
+        DispatchQueue.main.async {
+            self.tableView.beginUpdates()
+            self.tableView.insertRows(at: indexPaths, with: .fade)
+            self.tableView.endUpdates()
+        }
     }
 
     func listViewControllerModel(_ model: ListViewControllerModel, selectedItemsCountChanged count: Int) {
-        updateTitle()
+        DispatchQueue.main.async {
+            self.updateTitle()
+        }
     }
 
     func listViewControllerModelDidLoadHits(_ model: ListViewControllerModel) {
-        tableView.reloadData()
-        updateTitle()
+        DispatchQueue.main.async {
+            self.refreshControl?.endRefreshing()
+            self.tableView.reloadData()
+            self.updateTitle()
+        }
     }
 
     func listViewControllerModel(_ model: ListViewControllerModel, didFailWithError error: Error) {

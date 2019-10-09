@@ -21,7 +21,7 @@ final class ListViewControllerModel {
 
     var numberOfItems: Int { hits.count }
 
-    var selectedItemsCount: Int { selectedItemIndicies.count }
+    var selectedItemsCount: Int { selectedItems.count }
 
     func item(at indexPath: IndexPath) -> Hit {
         // auto load
@@ -33,21 +33,21 @@ final class ListViewControllerModel {
     }
 
     func isItemSelected(at indexPath: IndexPath) -> Bool {
-        return selectedItemIndicies.contains(item(at: indexPath).objectID)
+        return selectedItems.contains(item(at: indexPath).objectID)
     }
 
     func toggleItem(_ hit: Hit) {
-        if selectedItemIndicies.contains(hit.objectID) {
-            selectedItemIndicies.remove(hit.objectID)
+        if selectedItems.contains(hit.objectID) {
+            selectedItems.remove(hit.objectID)
         } else {
-            selectedItemIndicies.insert(hit.objectID)
+            selectedItems.insert(hit.objectID)
         }
     }
 
-    private var selectedItemIndicies = Set<String>() {
+    private var selectedItems = Set<String>() {
         didSet {
             DispatchQueue.main.async {
-                self.delegate?.listViewControllerModel(self, selectedItemsCountChanged: self.selectedItemIndicies.count)
+                self.delegate?.listViewControllerModel(self, selectedItemsCountChanged: self.selectedItems.count)
             }
         }
     }
@@ -63,9 +63,9 @@ final class ListViewControllerModel {
     }
 
     func reload() {
-        hits = []
-        lastLoadedPage = 0
+        requestFetcher = nil
         isFetching = false
+        lastLoadedPage = 0
         fetchNextPage()
     }
 
@@ -100,6 +100,7 @@ extension ListViewControllerModel: RequestFetcherDelegate {
         DispatchQueue.main.async {
             if fetcher.page == 1 {
                 self.hits = hits
+                self.selectedItems.removeAll()
                 self.delegate?.listViewControllerModelDidLoadHits(self)
             } else {
                 self.hits += hits
